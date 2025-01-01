@@ -135,6 +135,150 @@ describe('generic', () => {
         simpleBoolean.setValue(true)
         // simpleBoolean.setValue('Radiodadidu')
         // simpleBoolean.setValue(26)
+    })
 
+    class SimpleGenericWithDefault<T = string> {
+        private value?: T;
+
+        setValue(value: T) {
+            this.value = value;
+        }
+
+        getValue(): T | undefined {
+            return this.value;
+        }
+    }
+
+    it('should create simple generic type with default type', () => {
+        let simpleGeneric = new SimpleGenericWithDefault();
+        simpleGeneric.setValue('Gilang');
+        expect(simpleGeneric.getValue()).toBe('Gilang');
+    });
+
+    interface Employee {
+        id: string;
+        name: string;
+    }
+
+    interface Manager extends Employee {
+        totalEmployee: number;
+
+    }
+
+    interface VP extends Manager {
+        totalManager: number;
+
+    }
+
+    class EmlployeeData<T extends Employee> {
+        constructor(public employee: T) {
+
+        }
+    }
+
+    it('should support contstraint', () => {
+        const data1 = new EmlployeeData<Employee>({
+            id: '1',
+            name: 'Naufal'
+        });
+
+        const data2 = new EmlployeeData<Manager>({
+            id: '2',
+            name: 'Ferdi',
+            totalEmployee: 100
+        });
+
+        const data3 = new EmlployeeData<VP>({
+            id: '3',
+            name: 'Gilang',
+            totalEmployee: 100,
+            totalManager: 50
+        });
+    })
+
+    it('should support array', () => {
+        const arr = new Array<string>()
+
+        arr.push('Gilang');
+        arr.push('Ferdi');
+        arr.push('Naufal');
+
+        expect(arr[0]).toBe('Gilang');
+        expect(arr[1]).toBe('Ferdi');
+        expect(arr[2]).toBe('Naufal');
+
+        const arr2 = new Array<number>()
+        arr2.push(10);
+        arr2.push(20);
+        arr2.push(30);
+        expect(arr2[0]).toBe(10);
+        expect(arr2[1]).toBe(20);
+        expect(arr2[2]).toBe(30);
+        expect(arr2[3]).toBeUndefined(); // out of range
+        arr2[3] = 40; // assign value
+        expect(arr2[3]).toBe(40);
+    })
+
+    it('should support set', () => {
+        const set = new Set<string>()
+        set.add('Gilang1');
+        set.add('Naufal');
+        set.add('Ferdi');
+        set.add('Gilang');
+        // console.info(`before ${set}`);
+        expect(set.has('Gilang1')).toBe(true);
+        set.delete('Gilang1');
+        expect(set.has('Gilang1')).toBe(false);
+        expect(set.size).toBe(3);
+
+        for (let item of set) {
+            // console.info(item);
+        }
+        // console.info(`after ${set}`);
+        // expect([...set]).toEqual(['Ferdi', 'Naufal']);
+
+    })
+
+    it('should support map', () => {
+        const map = new Map<string, number>()
+        map.set('Gilang', 26);
+        map.set('Ferdi', 28);
+        map.set('Naufal', 30);
+        map.set('Gilang', 26);
+        // console.info(`before ${map}`);
+        for (let item of map) {
+            console.info(item);
+        }
+        expect(map.get('Gilang')).toBe(26);
+        map.delete('Gilang');
+        expect(map.has('Gilang')).toBe(false);
+        expect(map.size).toBe(2);
+    })
+
+    async function fetchData(value: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            setTimeout(() => {
+                if (value === 'error' || value === '' || value === undefined) {
+                    reject(`Not Found`);
+                    // reject(new Error('Fetch error'))
+                } else {
+                    resolve(`Data: ${value}`)
+                }
+            }, 1000)
+        })
+    }
+
+    it('should support promises', async () => {
+        const result = await fetchData('Gilang')
+        expect(result).toBe("Data: Gilang")
+        console.info(result)
+
+        try {
+            const res = await fetchData('Zack')
+            console.info(res)
+
+        } catch (err) {
+            expect(err).toBe(`Not Found`)
+        }
     })
 })
